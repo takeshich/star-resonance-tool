@@ -29,16 +29,6 @@ AIの認識精度を高めるため、以下の点に注意してスクリーン
     > <img src="docs/images/target_image_01.png" width="600" alt="ターゲット画像例1">
     > <br>
     > <img src="docs/images/target_image_02.png" width="600" alt="ターゲット画像例2">
-    > <br>
-    > <img src="docs/images/target_image_03.png" width="600" alt="ターゲット画像例3">
-    > <br>
-    > <img src="docs/images/target_image_04.png" width="600" alt="ターゲット画像例4">
-    > <br>
-    > <img src="docs/images/target_image_05.png" width="600" alt="ターゲット画像例5">
-    > <br>
-    > <img src="docs/images/target_image_06.png" width="600" alt="ターゲット画像例6">
-    > <br>
-    > <img src="docs/images/target_image_07.png" width="600" alt="ターゲット画像例7">
 
 ---
 
