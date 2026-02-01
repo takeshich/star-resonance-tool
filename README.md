@@ -33,7 +33,25 @@ docker compose up -d
 
 http://localhost:8501
 
-### 4. Stop Application
+> **初期画面**  
+> アプリケーションにアクセスすると、左側にサイドバー、右側にメインエリアが表示されます。  
+> <img src="docs/images/app_initial.png" width="800" alt="アプリ初期画面">
+
+### 4. Upload & Settings
+サイドバーからCSVファイルをアップロードし、探索条件を設定します。
+
+> **設定画面**  
+> マスタ画像とモジュール画像を解析して作成したCSVファイルをアップロードし、Lv.6を目指す項目（必須）や優先項目を選択します。  
+> <img src="docs/images/app_settings.png" width="400" alt="設定画面">
+
+### 5. Calculation Result
+「計算開始」ボタンを押すと、条件を満たす組み合わせが計算され、結果一覧が表示されます。
+
+> **計算結果画面**  
+> 組み合わせ候補がランク順に表示されます。到達レベルや合計値を確認できます。  
+> <img src="docs/images/app_result.png" width="800" alt="計算結果画面">
+
+### 6. Stop Application
 使用を終了する場合は以下のコマンドを実行します。
 
 ```bash
