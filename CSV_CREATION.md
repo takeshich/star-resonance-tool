@@ -26,9 +26,9 @@ AIの認識精度を高めるため、以下の点に注意してスクリーン
     - 数値とアイコンができるだけ鮮明に映る解像度で撮影してください。
 
     > **ターゲット画像の例 (モジュール詳細)**  
-    > <img src="docs/images/target_image_01.png" width="600" alt="ターゲット画像例1">
+    > <img src="docs/images/target_image_01.png" width="200" alt="ターゲット画像例1">
     > <br>
-    > <img src="docs/images/target_image_02.png" width="600" alt="ターゲット画像例2">
+    > <img src="docs/images/target_image_02.png" width="200" alt="ターゲット画像例2">
 
 ---
 
