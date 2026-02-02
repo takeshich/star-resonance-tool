@@ -18,7 +18,20 @@ Python + Streamlit で構築されており、Docker環境またはGoogle Colab�
 - Docker
 - Docker Compose
 
-## Installation & Usage
+## Google Colabでの使い方（推奨）
+
+環境構築不要で、ブラウザ（PC・スマホ）からすぐに利用できます。
+
+1. ページ上部の **[Open In Colab]** ボタンをクリックします。
+2. Google Colabの画面が開きます（Googleアカウントへのログインが必要です）。
+3. 画面上の **再生ボタン（▶）** を上から順にクリックして実行します。
+   - 「警告: このノートブックは Google が作成したものではありません」と表示された場合は「実行」を押してください。
+4. 最後のセルを実行後、ログの中に表示されるURLをクリックします。
+   - `https://(ランダムな文字列).trycloudflare.com` という形式のリンクです。
+5. アプリが起動します。
+
+## Installation & Usage (Local Docker)
+
 
 ### 1. Clone or Download
 このリポジトリをクローンするか、ZIPでダウンロードして解凍します。
