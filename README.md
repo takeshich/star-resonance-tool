@@ -1,8 +1,10 @@
 # Star Resonance Module Calculator
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/takeshich/star-resonance-tool/blob/main/Colab_Launch.ipynb)
+
 ゲーム「スターレゾナンス」のモジュール装備において、最適な組み合わせ（特に「魔法耐性」「物理耐性」などのLv.6到達）を探索するための計算ツールです。
 
-Python + Streamlit で構築されており、Docker環境があればすぐに利用可能です。
+Python + Streamlit で構築されており、Docker環境またはGoogle Colabですぐに利用可能です。
 
 ## Features
 
