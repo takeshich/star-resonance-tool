@@ -75,6 +75,12 @@ if uploaded_file:
             options=ALL_OPTIONS
         )
 
+        display_limit = st.sidebar.selectbox(
+            "表示件数",
+            options=[20, 50, 100],
+            index=0
+        )
+
         if st.sidebar.button("🚀 計算開始", type="primary"):
             st.markdown("---")
             st.header("計算結果")
@@ -104,31 +110,50 @@ if uploaded_file:
                     if any(stats[opt] < 20 for opt in must_options):
                         continue
                     
-                    score = sum(stats[opt] for opt in priority_options)
-                    total_value = sum(stats.values())
+                    # レベル計算ヘルパー
+                    def calc_level(val):
+                        if val >= 20: return 6
+                        if val >= 16: return 5
+                        if val >= 12: return 4
+                        if val >= 8:  return 3
+                        if val >= 4:  return 2
+                        if val >= 1:  return 1
+                        return 0
+
+                    priority_level_sum = sum(calc_level(stats[opt]) for opt in priority_options)
+                    total_level_sum = sum(calc_level(v) for v in stats.values())
                     
                     # 隠れLv.6
                     extra_max = [
                         k for k, v in stats.items() 
                         if v >= 20 and k not in must_options and k not in priority_options
                     ]
+
+                    # 互換性のため残す（表示用に使われる可能性があるため）
+                    score = sum(stats[opt] for opt in priority_options)
+                    total_value = sum(stats.values())
+                    nonzero_count = sum(1 for v in stats.values() if v > 0)
                     
                     results.append({
                         'combo': combo,
                         'stats': stats,
                         'score': score,
                         'total_value': total_value,
+                        'priority_level_sum': priority_level_sum,
+                        'total_level_sum': total_level_sum,
+                        'nonzero_count': nonzero_count,
                         'extra_max': extra_max
                     })
                 
                 if not results:
                     st.warning("条件を満たす組み合わせがありませんでした。")
                 else:
-                    results.sort(key=lambda x: (len(x['extra_max']), x['score'], x['total_value']), reverse=True)
+                    # ソート順: Lv.6数 > 優先項目のレベル合計 > 全項目のレベル合計
+                    results.sort(key=lambda x: (len(x['extra_max']), x['priority_level_sum'], x['total_level_sum']), reverse=True)
                     
                     st.success(f"{len(results)} 通りの組み合わせが見つかりました")
                     
-                    for rank, res in enumerate(results[:20], 1):
+                    for rank, res in enumerate(results[:display_limit], 1):
                         
                         # --- タイトルを番号のみに変更 ---
                         st.subheader(f"{rank}")
