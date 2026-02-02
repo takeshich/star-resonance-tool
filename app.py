@@ -45,7 +45,16 @@ def highlight_rows(row):
 st.title("🛡️ モジュール組み合わせ計算機")
 
 st.sidebar.header("1. データ読み込み")
-uploaded_file = st.sidebar.file_uploader("CSVファイルをアップロード", type="csv")
+sidebar_upload = st.sidebar.file_uploader("CSVファイルをアップロード", type="csv", key="sidebar_upload")
+
+# サイドバーまたはメイン画面のどちらからでもアップロード可能にする
+uploaded_file = sidebar_upload
+
+if not uploaded_file:
+    st.markdown("### 📂 CSVファイルのアップロード")
+    st.info("サイドバー、またはここからCSVファイルをアップロードしてください。")
+    main_upload = st.file_uploader("CSVファイルをドラッグ＆ドロップ", type="csv", key="main_upload")
+    uploaded_file = main_upload
 
 if uploaded_file:
     try:
