@@ -7,3 +7,7 @@ env/
 venv/
 
 logs/
+
+# Internal documentation and rules
+internal_docs/
+.rules/
