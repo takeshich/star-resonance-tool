@@ -11,3 +11,6 @@ logs/
 # Internal documentation and rules
 internal_docs/
 .rules/
+
+# Workflows
+Workflows/
