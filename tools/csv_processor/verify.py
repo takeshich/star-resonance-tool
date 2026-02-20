@@ -17,8 +17,11 @@ def load_and_sort(path):
         sys.exit(1)
 
 try:
-    h1, r1 = load_and_sort('tools/csv_processor/master_data.csv')
-    h2, r2 = load_and_sort('tools/csv_processor/fortests/master_data_seikai.csv')
+    file1 = sys.argv[1] if len(sys.argv) > 1 else 'tools/csv_processor/master_data.csv'
+    file2 = sys.argv[2] if len(sys.argv) > 2 else 'tools/csv_processor/fortests/master_data_seikai.csv'
+
+    h1, r1 = load_and_sort(file1)
+    h2, r2 = load_and_sort(file2)
 
     # Verify Header
     if h1 != h2:
