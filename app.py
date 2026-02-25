@@ -67,6 +67,26 @@ if uploaded_file:
         
         st.sidebar.header("2. 探索条件")
         
+        # --- モジュールタイプによる絞り込みの追加 ---
+        module_type_col = "モジュールタイプ"
+        has_module_type = module_type_col in df.columns
+        selected_module_types = []
+        
+        if has_module_type:
+            # np.nan等の無効な値を除外。空白を除去してサニタイズ
+            df[module_type_col] = df[module_type_col].astype(str).str.strip()
+            available_types = [t for t in df[module_type_col].unique().tolist() if t != '0' and t != 'nan' and t != 'None']
+            
+            # デフォルトを「防御」に設定。もし「防御」が存在しない場合はあるものを全て選択状態にする
+            default_types = ["防御"] if "防御" in available_types else available_types
+            
+            selected_module_types = st.sidebar.multiselect(
+                "【絞り込み】使用するモジュールタイプ",
+                options=available_types,
+                default=default_types
+            )
+            st.sidebar.markdown("---")
+        
         default_must = [c for c in ["魔法耐性", "物理耐性"] if c in df.columns]
         must_options = st.sidebar.multiselect(
             "【必須】Lv.6 (値20以上) にする項目",
@@ -90,69 +110,91 @@ if uploaded_file:
             index=0
         )
 
+        # レベル計算ヘルパー（ループ外へ移動して高速化）
+        def calc_level(val):
+            if val >= 20: return 6
+            if val >= 16: return 5
+            if val >= 12: return 4
+            if val >= 8:  return 3
+            if val >= 4:  return 2
+            if val >= 1:  return 1
+            return 0
+
         if st.sidebar.button("🚀 計算開始", type="primary"):
             st.markdown("---")
             st.header("計算結果")
             
-            filtered_df = df.copy()
-            if exclude_options:
-                mask = (filtered_df[exclude_options] > 0).any(axis=1)
-                filtered_df = filtered_df[~mask]
-            
-            targets = list(set(must_options + priority_options))
-            if targets:
-                filtered_df = filtered_df[filtered_df[targets].sum(axis=1) > 0]
-            
-            modules = filtered_df.to_dict('records')
-            
-            if len(modules) < 4:
-                st.error("有効なモジュールが4つ未満です。")
-            else:
-                results = []
+            # --- プログレス（待機）表示の追加 ---
+            with st.spinner('組み合わせを空間探索中... (モジュール数が多いと時間がかかります)'):
+                filtered_df = df.copy()
                 
-                for combo in combinations(modules, 4):
-                    stats = {k: 0 for k in ALL_OPTIONS}
-                    for m in combo:
-                        for k in ALL_OPTIONS:
-                            stats[k] += m.get(k, 0)
+                # モジュールタイプでフィルタリング
+                if has_module_type and selected_module_types:
+                    filtered_df = filtered_df[filtered_df[module_type_col].isin(selected_module_types)]
+                
+                if exclude_options:
+                    mask = (filtered_df[exclude_options] > 0).any(axis=1)
+                    filtered_df = filtered_df[~mask]
+                
+                targets = list(set(must_options + priority_options))
+                if targets:
+                    filtered_df = filtered_df[filtered_df[targets].sum(axis=1) > 0]
+                
+                modules = filtered_df.to_dict('records')
+                
+                if len(modules) < 4:
+                    st.error(f"有効なモジュールが選ばれていないか、4つ未満です（現在: {len(modules)}個）。条件を緩めてください。")
+                else:
+                    results = []
                     
-                    if any(stats[opt] < 20 for opt in must_options):
-                        continue
+                    # 高速化のためのインデックスとタプル展開
+                    must_indices = [ALL_OPTIONS.index(opt) for opt in must_options]
+                    priority_indices = [ALL_OPTIONS.index(opt) for opt in priority_options]
+                    all_len = len(ALL_OPTIONS)
                     
-                    # レベル計算ヘルパー
-                    def calc_level(val):
-                        if val >= 20: return 6
-                        if val >= 16: return 5
-                        if val >= 12: return 4
-                        if val >= 8:  return 3
-                        if val >= 4:  return 2
-                        if val >= 1:  return 1
-                        return 0
-
-                    priority_level_sum = sum(calc_level(stats[opt]) for opt in priority_options)
-                    total_level_sum = sum(calc_level(v) for v in stats.values())
+                    # 全モジュールをタプルに変換（辞書アクセスを排除）
+                    mod_tuples = [tuple(m.get(k, 0) for k in ALL_OPTIONS) for m in modules]
                     
-                    # 隠れLv.6
-                    extra_max = [
-                        k for k, v in stats.items() 
-                        if v >= 20 and k not in must_options and k not in priority_options
-                    ]
-
-                    # 互換性のため残す（表示用に使われる可能性があるため）
-                    score = sum(stats[opt] for opt in priority_options)
-                    total_value = sum(stats.values())
-                    nonzero_count = sum(1 for v in stats.values() if v > 0)
-                    
-                    results.append({
-                        'combo': combo,
-                        'stats': stats,
-                        'score': score,
-                        'total_value': total_value,
-                        'priority_level_sum': priority_level_sum,
-                        'total_level_sum': total_level_sum,
-                        'nonzero_count': nonzero_count,
-                        'extra_max': extra_max
-                    })
+                    # 組み合わせの生成と評価をタプル・インデックスベースで実行
+                    for combo_indices in combinations(range(len(modules)), 4):
+                        m1 = mod_tuples[combo_indices[0]]
+                        m2 = mod_tuples[combo_indices[1]]
+                        m3 = mod_tuples[combo_indices[2]]
+                        m4 = mod_tuples[combo_indices[3]]
+                        
+                        # 必須レベルの早期チェック（閾値20未満があればスキップ）
+                        is_valid = True
+                        for idx in must_indices:
+                            if m1[idx] + m2[idx] + m3[idx] + m4[idx] < 20:
+                                is_valid = False
+                                break
+                        if not is_valid:
+                            continue
+                        
+                        # 個別ステータス合計
+                        stats_vals = [m1[i] + m2[i] + m3[i] + m4[i] for i in range(all_len)]
+                        
+                        priority_level_sum = sum(calc_level(stats_vals[i]) for i in priority_indices)
+                        total_level_sum = sum(calc_level(v) for v in stats_vals)
+                        
+                        extra_max = [
+                            ALL_OPTIONS[i] for i, v in enumerate(stats_vals)
+                            if v >= 20 and i not in must_indices and i not in priority_indices
+                        ]
+                        
+                        # 辞書に戻して互換性を維持
+                        stats_dict = {ALL_OPTIONS[i]: stats_vals[i] for i in range(all_len)}
+                        
+                        results.append({
+                            'combo': [modules[i] for i in combo_indices],
+                            'stats': stats_dict,
+                            'score': sum(stats_vals[i] for i in priority_indices),
+                            'total_value': sum(stats_vals),
+                            'priority_level_sum': priority_level_sum,
+                            'total_level_sum': total_level_sum,
+                            'nonzero_count': sum(1 for v in stats_vals if v > 0),
+                            'extra_max': extra_max
+                        })
                 
                 if not results:
                     st.warning("条件を満たす組み合わせがありませんでした。")
