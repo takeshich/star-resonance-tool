@@ -13,9 +13,4 @@ internal_docs/
 .rules/
 
 # Workflows
-Workflows/
-
-# Temporary verification logs
-tools/csv_processor/batch_log.md
-tools/csv_processor/reasoning_log.md
-tools/csv_processor/accuracy_log.md
+/Workflows/
