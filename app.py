@@ -199,8 +199,8 @@ if uploaded_file:
                 if not results:
                     st.warning("条件を満たす組み合わせがありませんでした。")
                 else:
-                    # ソート順: Lv.6数 > 全項目のレベル合計 > 優先項目のレベル合計
-                    results.sort(key=lambda x: (len(x['extra_max']), x['priority_level_sum'], x['total_level_sum']), reverse=True)
+                    # ソート順: 全項目のレベル合計（リンク効果） > 優先項目のレベル合計 > 隠れLv.6数
+                    results.sort(key=lambda x: (x['total_level_sum'], x['priority_level_sum'], len(x['extra_max'])), reverse=True)
                     
                     st.success(f"{len(results)} 通りの組み合わせが見つかりました")
                     
