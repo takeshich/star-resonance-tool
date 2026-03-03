@@ -13,4 +13,8 @@ internal_docs/
 .rules/
 
 # Workflows
-Workflows/
+/Workflows/
+
+# External Tools
+local_log_extractor/
+scripts/
