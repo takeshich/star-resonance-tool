@@ -16,3 +16,5 @@ internal_docs/
 /Workflows/
 
 # External Tools
+local_log_extractor/
+scripts/
